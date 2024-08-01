@@ -5,13 +5,13 @@ namespace SRTPluginUIEDDirectXOverlay
 {
     internal class PluginInfo : IPluginInfo
     {
-        public string Name => "DirectX Overlay UI (Resident Evil 7 (2017))";
+        public string Name => "DirectX Overlay UI (Elden Ring)";
 
-        public string Description => "A DirectX-based Overlay User Interface for displaying Resident Evil 7 (2017) game memory values.";
+        public string Description => "A DirectX-based Overlay User Interface for displaying Elden Ring game memory values.";
 
-        public string Author => "VideoGameRoulette";
+        public string Author => "Mysterion352";
 
-        public Uri MoreInfoURL => new Uri("https://github.com/SpeedrunTooling/SRTPluginUIRE7DirectXOverlay");
+        public Uri MoreInfoURL => new Uri("https://github.com/SpeedrunTooling/SRTPluginUIEDDirectXOverlay");
 
         public int VersionMajor => assemblyFileVersion.ProductMajorPart;
 

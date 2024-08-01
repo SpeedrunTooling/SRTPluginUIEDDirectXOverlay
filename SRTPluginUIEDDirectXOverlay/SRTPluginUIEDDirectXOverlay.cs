@@ -560,7 +560,7 @@ namespace SRTPluginUIRE7DirectXOverlay
                         }
                         DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                     }
-                }/*
+                }
                 //Nokron Eternal City
                 else if (gameMemory.RegionID == 12020)
                 {
@@ -601,7 +601,7 @@ namespace SRTPluginUIRE7DirectXOverlay
                         DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                     }
                 }
-                Lake of Rot
+                //Lake of Rot
                 else if (gameMemory.RegionID == 99999)
                 {
                     if (counter >= 162 && counter <= 163 && status.Equals("Alive")) // Only display the 4th and 5th items
@@ -660,7 +660,7 @@ namespace SRTPluginUIRE7DirectXOverlay
                         }
                         DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                     }
-                }*/
+                }
 
                 counter++;
             }
