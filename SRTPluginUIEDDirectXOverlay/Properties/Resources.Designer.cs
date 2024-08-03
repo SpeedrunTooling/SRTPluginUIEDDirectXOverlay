@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SRTPluginUIRE7DirectXOverlay.Properties {
+namespace SRTPluginUIEDDirectXOverlay.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SRTPluginUIRE7DirectXOverlay.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SRTPluginUIRE7DirectXOverlay.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SRTPluginUIEDDirectXOverlay.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

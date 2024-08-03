@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Runtime.InteropServices;
 
 namespace SRTPluginUIEDDirectXOverlay
 {
@@ -6,6 +7,7 @@ namespace SRTPluginUIEDDirectXOverlay
     {
         [DllImport("user32.dll")]
         public static extern bool EnumDisplaySettings(string deviceName, int modeNum, ref DEVMODE devMode);
+
     }
 
     [StructLayout(LayoutKind.Sequential)]

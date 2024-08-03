@@ -15,6 +15,7 @@
         public string StringFontName { get; set; }
         public byte BellBearingHunter { get; set; }
         public byte BlackKnifeAssassin { get; set; }
+        public bool ShowBossStatus { get; set; }
 
         public PluginConfiguration()
         {
@@ -23,6 +24,7 @@
             ScalingFactor = 1f;
             PositionX = 5f;
             PositionY = 50f;
+            ShowBossStatus = true;
             //InventoryPositionX = -1;
             //InventoryPositionY = -1;
             StringFontName = "Courier New";
