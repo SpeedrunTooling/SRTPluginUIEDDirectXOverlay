@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
@@ -66,6 +67,7 @@ namespace SRTPluginUIEDDirectXOverlay
         private string PlayerName = "";
 
 
+
         [STAThread]
         public override int Startup(IPluginHostDelegates hostDelegates)
         {
@@ -99,6 +101,10 @@ namespace SRTPluginUIEDDirectXOverlay
             };
             _graphics?.Setup();
 
+            //Application.AddMessageFilter(new HotKeyMessageFilter());
+
+            //Application.Run(new Form());
+
 
             // Get a reference to the underlying RenderTarget from SharpDX.
             _device = (SharpDX.Direct2D1.WindowRenderTarget)typeof(Graphics)
@@ -106,7 +112,6 @@ namespace SRTPluginUIEDDirectXOverlay
                 .GetValue(_graphics);
 
             _consolasBold = _graphics?.CreateFont("Consolas", 12, true);
-
             _black = _graphics?.CreateSolidBrush(0, 0, 0);
             _white = _graphics?.CreateSolidBrush(255, 255, 255);
             _grey = _graphics?.CreateSolidBrush(128, 128, 128);
@@ -122,7 +127,6 @@ namespace SRTPluginUIEDDirectXOverlay
             _lawngreen = _graphics?.CreateSolidBrush(124, 252, 0);
             _goldenrod = _graphics?.CreateSolidBrush(218, 165, 32);
             HPBarColor = _grey;
-            TextColor = _white;
             return 0;
         }
 
@@ -185,8 +189,6 @@ namespace SRTPluginUIEDDirectXOverlay
             {
                 _graphics?.EndScene();
             }
-
-
             return 0;
         }
 
@@ -222,7 +224,14 @@ namespace SRTPluginUIEDDirectXOverlay
             int[] LakeOfRot = {9999 };
             int[] LeyndellAshenCapital = { 11050 };
             int[] EldenThrone = { 19000};
-
+            int[] GravesitePlain = { 68000, 20000, 22000};
+            int[] AbyssalWoods = { 68600, 28000};
+            int[] FingerRuins = { 68300, 6830000};
+            int[] ScaduAltus = { 69001, 21010, 69200, 69000};
+            int[] ScaduView = { 6920001, };
+            int[] RauhBase = { 69400, 40010};
+            int[] JaggedPeak = { 68500 };
+            int[] EnirIlim = { 20010};
 
             int counter = 0;
             int killed = 0;
@@ -231,7 +240,6 @@ namespace SRTPluginUIEDDirectXOverlay
 
                 foreach (KeyValuePair<string, int> bossOffset in GamePlayer.bossStatusOffsets)
                 {
-                    
                     string status = gameMemory.BossStatus[bossOffset.Key] == 0 || gameMemory.BossStatus[bossOffset.Key] == 104 ? "Alive" : "Dead";
 
                     if(gameMemory.BossStatus[bossOffset.Key] == 0 || gameMemory.BossStatus[bossOffset.Key] == 104)
@@ -659,11 +667,193 @@ namespace SRTPluginUIEDDirectXOverlay
                         }
                     }
 
+                    //DLC
+                    //Gravesite Plain
+                    else if (GravesitePlain.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 167 && counter <= 178 && status.Equals("Alive"))
+                        {
+                            if (counter == 178)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Gravesite Plain", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 167 && counter <= 178 && status.Equals("Dead"))
+                        {
+                            if (counter == 167)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Gravesite Plain", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Abyssal Woods
+                    else if (AbyssalWoods.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 179 && counter <= 180 && status.Equals("Alive"))
+                        {
+                            if (counter == 179)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Abyssal Woods", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 179 && counter <= 180 && status.Equals("Dead"))
+                        {
+                            if (counter == 179)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Abyssal Woods", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Finger Ruins
+                    else if (FingerRuins.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 181 && status.Equals("Alive"))
+                        {
+                            if (counter == 181)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Finger Ruins", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 181 && status.Equals("Dead"))
+                        {
+                            if (counter == 181)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Finger Ruins", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Scadu Altus
+                    else if (ScaduAltus.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 182 && counter <= 193 && status.Equals("Alive"))
+                        {
+                            if (counter == 182)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scadu Altus", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 182 && counter <= 193 && status.Equals("Dead"))
+                        {
+                            if (counter == 182)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scadu Altus", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Charo's Hidden Grave
+                    else if (gameMemory.RegionID == 68000)
+                    {
+                        if (counter == 194 && status.Equals("Alive"))
+                        {
+                            if (counter == 194)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Charo's Hidden Grave", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 194 && status.Equals("Dead"))
+                        {
+                            if (counter == 194)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Charo's Hidden Grave", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Scaduview
+                    else if (ScaduView.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 195 && counter <= 196 && status.Equals("Alive"))
+                        {
+                            if (counter == 195)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scaduview", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 195 && counter <= 196 && status.Equals("Dead"))
+                        {
+                            if (counter == 195)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scaduview", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Rauh Base
+                    else if (RauhBase.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 197 && counter <= 198 && status.Equals("Alive"))
+                        {
+                            if (counter == 197)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Rauh Base", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 197 && counter <= 198 && status.Equals("Dead"))
+                        {
+                            if (counter == 197)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Rauh Base", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Jagged Peak
+                    else if (JaggedPeak.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 199 && counter <= 202 && status.Equals("Alive"))
+                        {
+                            if (counter == 199)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Jagged Peak", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 199 && counter <= 202 && status.Equals("Dead"))
+                        {
+                            if (counter == 199)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Jagged Peak", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+                    //Enir Ilim
+                    else if (EnirIlim.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 203 && status.Equals("Alive"))
+                        {
+                            if (counter == 203)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Enir Ilim", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 203 && status.Equals("Dead"))
+                        {
+                            if (counter == 203)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Enir Ilim", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
+
                     counter++;
                 }
                 killed = 167 - killed;
-                DrawTextBlock(ref textOffsetX, ref statsYOffset,"Killed: ", killed.ToString() + "/167");
-
+                DrawTextBlock(ref textOffsetX, ref statsYOffset,"Main Game Killed: ", killed.ToString() + "/167");
+                DrawTextBlock(ref textOffsetX, ref statsYOffset, "DLC Killed: ", killed.ToString() + "/204");
             }
             
         }
