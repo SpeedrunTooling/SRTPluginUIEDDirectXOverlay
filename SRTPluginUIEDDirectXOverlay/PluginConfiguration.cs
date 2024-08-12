@@ -1,4 +1,7 @@
-﻿namespace SRTPluginUIEDDirectXOverlay
+﻿using System;
+using System.Collections.Generic;
+
+namespace SRTPluginUIEDDirectXOverlay
 {
     public class PluginConfiguration
     {
@@ -13,8 +16,6 @@
         //public float InventoryPositionY { get; set; }
 
         public string StringFontName { get; set; }
-        public byte BellBearingHunter { get; set; }
-        public byte BlackKnifeAssassin { get; set; }
         public bool ShowBossStatus { get; set; }
 
         public PluginConfiguration()

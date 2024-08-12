@@ -2,19 +2,15 @@
 using GameOverlay.Windows;
 using SRTPluginBase;
 using SRTPluginProviderED;
-using SRTPluginProviderED.Structs;
 using SRTPluginProviderED.Structs.GameStructs;
-using SRTPluginUIEDDirectXOverlay;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Windows.Forms;
-using System.Xml.Linq;
+using GlobalHotKey;
+using System.Threading;
 
 namespace SRTPluginUIEDDirectXOverlay
 {
@@ -26,35 +22,15 @@ namespace SRTPluginUIEDDirectXOverlay
         public string RequiredProvider => "SRTPluginProviderED";
         private IPluginHostDelegates hostDelegates;
         private IGameMemoryED gameMemory;
-
         // DirectX Overlay-specific.
-        private OverlayWindow _window;
+        private static OverlayWindow _window;
         private Graphics _graphics;
         private SharpDX.Direct2D1.WindowRenderTarget _device;
 
         private Font _consolasBold;
 
-        private SolidBrush _black;
-        private SolidBrush _white;
-        private SolidBrush _grey;
-        private SolidBrush _darkred;
-        private SolidBrush _red;
-        private SolidBrush _lightred;
-        private SolidBrush _lightyellow;
-        private SolidBrush _lightgreen;
-        private SolidBrush _lawngreen;
-        private SolidBrush _goldenrod;
-        private SolidBrush _greydark;
-        private SolidBrush _greydarker;
-        private SolidBrush _darkgreen;
-        private SolidBrush _darkyellow;
+        private SolidBrush _black, _white, _grey, _darkred, _red, _lightred, _lightyellow, _lightgreen, _lawngreen, _goldenrod, _greydark, _greydarker, _darkgreen, _darkyellow;
 
-        //private IReadOnlyDictionary<ItemEnumeration, SharpDX.Mathematics.Interop.RawRectangleF> itemToImageTranslation;
-        //private IReadOnlyDictionary<Weapon, SharpDX.Mathematics.Interop.RawRectangleF> weaponToImageTranslation;
-        //private SharpDX.Direct2D1.Bitmap _invItemSheet1;
-        //private SharpDX.Direct2D1.Bitmap _invItemSheet2;
-        //private int INV_SLOT_WIDTH;
-        //private int INV_SLOT_HEIGHT;
         public static PluginConfiguration config;
         private Process GetProcess() => Process.GetProcessesByName("eldenring")?.FirstOrDefault();
         private Process gameProcess;
@@ -65,6 +41,8 @@ namespace SRTPluginUIEDDirectXOverlay
         SolidBrush TextColor;
 
         private string PlayerName = "";
+
+
 
 
 
@@ -86,6 +64,7 @@ namespace SRTPluginUIEDDirectXOverlay
             // Create and initialize the overlay window.
             _window = new OverlayWindow(0, 0, devMode.dmPelsWidth, devMode.dmPelsHeight);
             _window?.Create();
+            //Application.AddMessageFilter(new HotKeyMessageFilter());
 
             // Set up the graphics object.
             _graphics = new Graphics()
@@ -100,11 +79,6 @@ namespace SRTPluginUIEDDirectXOverlay
                 WindowHandle = _window.Handle
             };
             _graphics?.Setup();
-
-            //Application.AddMessageFilter(new HotKeyMessageFilter());
-
-            //Application.Run(new Form());
-
 
             // Get a reference to the underlying RenderTarget from SharpDX.
             _device = (SharpDX.Direct2D1.WindowRenderTarget)typeof(Graphics)
@@ -127,8 +101,12 @@ namespace SRTPluginUIEDDirectXOverlay
             _lawngreen = _graphics?.CreateSolidBrush(124, 252, 0);
             _goldenrod = _graphics?.CreateSolidBrush(218, 165, 32);
             HPBarColor = _grey;
+
+            GlobalHotkeyHandler.Init(config);
+
             return 0;
         }
+
 
         public override int Shutdown()
         {
@@ -149,7 +127,7 @@ namespace SRTPluginUIEDDirectXOverlay
             _goldenrod?.Dispose();
 
             _consolasBold?.Dispose();
-
+            GlobalHotkeyHandler.Cleanup();
             _device = null; // We didn't create this object so we probably shouldn't be the one to dispose of it. Just set the variable to null so the reference isn't held.
             _graphics?.Dispose(); // This should technically be the one to dispose of the _device object since it was pulled from this instance.
             _graphics = null;
@@ -158,7 +136,6 @@ namespace SRTPluginUIEDDirectXOverlay
 
             gameProcess?.Dispose();
             gameProcess = null;
-
             return 0;
         }
         public int ReceiveData(object gameMemory)
@@ -166,6 +143,8 @@ namespace SRTPluginUIEDDirectXOverlay
             this.gameMemory = (IGameMemoryED)gameMemory;
             _window?.PlaceAbove(gameWindowHandle);
             _window?.FitTo(gameWindowHandle, true);
+            Message message;
+            
 
             try
             {
@@ -191,6 +170,8 @@ namespace SRTPluginUIEDDirectXOverlay
             }
             return 0;
         }
+
+
 
         private void DrawOverlay()
         {
@@ -225,16 +206,20 @@ namespace SRTPluginUIEDDirectXOverlay
             int[] LeyndellAshenCapital = { 11050 };
             int[] EldenThrone = { 19000};
             int[] GravesitePlain = { 68000, 20000, 22000};
+            int[] CeruleanCoast = { 68300 };
             int[] AbyssalWoods = { 68600, 28000};
-            int[] FingerRuins = { 68300, 6830000};
+            int[] FingerRuins = { 6830000 };
             int[] ScaduAltus = { 69001, 21010, 69200, 69000};
             int[] ScaduView = { 6920001, };
             int[] RauhBase = { 69400, 40010};
             int[] JaggedPeak = { 68500 };
             int[] EnirIlim = { 20010};
 
+            int[] aliveDLC = { 0, 64, 16384, 2049};
+
             int counter = 0;
             int killed = 0;
+            int DLCkilled = 0;
             if (config.ShowBossStatus)
             {
 
@@ -242,9 +227,14 @@ namespace SRTPluginUIEDDirectXOverlay
                 {
                     string status = gameMemory.BossStatus[bossOffset.Key] == 0 || gameMemory.BossStatus[bossOffset.Key] == 104 ? "Alive" : "Dead";
 
-                    if(gameMemory.BossStatus[bossOffset.Key] == 0 || gameMemory.BossStatus[bossOffset.Key] == 104)
+                    if((gameMemory.BossStatus[bossOffset.Key] == 0 || gameMemory.BossStatus[bossOffset.Key] == 104) && counter <= 166)
                     {
                         killed = killed + 1;
+                        
+                    }
+                    if (aliveDLC.Contains(gameMemory.BossStatus[bossOffset.Key]) && counter >= 167)
+                    {
+                        DLCkilled = DLCkilled + 1;
                     }
                     //Limgrave
                     if (Limgrave.Contains(gameMemory.RegionID) || gameMemory.RegionID >= 6100000 && gameMemory.RegionID <= 6109999)
@@ -673,7 +663,7 @@ namespace SRTPluginUIEDDirectXOverlay
                     {
                         if (counter == 167 && counter <= 178 && status.Equals("Alive"))
                         {
-                            if (counter == 178)
+                            if (counter == 167)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Gravesite Plain", "");
                             }
@@ -688,20 +678,40 @@ namespace SRTPluginUIEDDirectXOverlay
                             DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
                     }
+                    //Cerulean Coast
+                    else if (CeruleanCoast.Contains(gameMemory.RegionID))
+                    {
+                        if (counter == 179 && counter <= 181 && status.Equals("Alive"))
+                        {
+                            if (counter == 179)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Cerulean Coast", "");
+                            }
+                            DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                        else if (counter == 179 && counter <= 181 && status.Equals("Dead"))
+                        {
+                            if (counter == 179)
+                            {
+                                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Cerulean Coast", "");
+                            }
+                            DrawTextBlockRed(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
+                        }
+                    }
                     //Abyssal Woods
                     else if (AbyssalWoods.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 179 && counter <= 180 && status.Equals("Alive"))
+                        if (counter == 182 && counter <= 183 && status.Equals("Alive"))
                         {
-                            if (counter == 179)
+                            if (counter == 182)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Abyssal Woods", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 179 && counter <= 180 && status.Equals("Dead"))
+                        else if (counter == 182 && counter <= 183 && status.Equals("Dead"))
                         {
-                            if (counter == 179)
+                            if (counter == 182)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Abyssal Woods", "");
                             }
@@ -711,17 +721,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Finger Ruins
                     else if (FingerRuins.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 181 && status.Equals("Alive"))
+                        if (counter == 184 && status.Equals("Alive"))
                         {
-                            if (counter == 181)
+                            if (counter == 184)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Finger Ruins", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 181 && status.Equals("Dead"))
+                        else if (counter == 184 && status.Equals("Dead"))
                         {
-                            if (counter == 181)
+                            if (counter == 184)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Finger Ruins", "");
                             }
@@ -731,17 +741,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Scadu Altus
                     else if (ScaduAltus.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 182 && counter <= 193 && status.Equals("Alive"))
+                        if (counter == 185 && counter <= 196 && status.Equals("Alive"))
                         {
-                            if (counter == 182)
+                            if (counter == 185)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scadu Altus", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 182 && counter <= 193 && status.Equals("Dead"))
+                        else if (counter == 185 && counter <= 196 && status.Equals("Dead"))
                         {
-                            if (counter == 182)
+                            if (counter == 185)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scadu Altus", "");
                             }
@@ -751,17 +761,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Charo's Hidden Grave
                     else if (gameMemory.RegionID == 68000)
                     {
-                        if (counter == 194 && status.Equals("Alive"))
+                        if (counter == 197 && status.Equals("Alive"))
                         {
-                            if (counter == 194)
+                            if (counter == 197)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Charo's Hidden Grave", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 194 && status.Equals("Dead"))
+                        else if (counter == 197 && status.Equals("Dead"))
                         {
-                            if (counter == 194)
+                            if (counter == 197)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Charo's Hidden Grave", "");
                             }
@@ -771,17 +781,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Scaduview
                     else if (ScaduView.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 195 && counter <= 196 && status.Equals("Alive"))
+                        if (counter == 198 && counter <= 200 && status.Equals("Alive"))
                         {
-                            if (counter == 195)
+                            if (counter == 198)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scaduview", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 195 && counter <= 196 && status.Equals("Dead"))
+                        else if (counter == 198 && counter <= 200 && status.Equals("Dead"))
                         {
-                            if (counter == 195)
+                            if (counter == 198)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Scaduview", "");
                             }
@@ -791,17 +801,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Rauh Base
                     else if (RauhBase.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 197 && counter <= 198 && status.Equals("Alive"))
+                        if (counter == 201 && counter <= 202 && status.Equals("Alive"))
                         {
-                            if (counter == 197)
+                            if (counter == 201)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Rauh Base", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 197 && counter <= 198 && status.Equals("Dead"))
+                        else if (counter == 201 && counter <= 202 && status.Equals("Dead"))
                         {
-                            if (counter == 197)
+                            if (counter == 201)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Rauh Base", "");
                             }
@@ -811,17 +821,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Jagged Peak
                     else if (JaggedPeak.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 199 && counter <= 202 && status.Equals("Alive"))
+                        if (counter == 203 && counter <= 206 && status.Equals("Alive"))
                         {
-                            if (counter == 199)
+                            if (counter == 203)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Jagged Peak", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 199 && counter <= 202 && status.Equals("Dead"))
+                        else if (counter == 203 && counter <= 206 && status.Equals("Dead"))
                         {
-                            if (counter == 199)
+                            if (counter == 203)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Jagged Peak", "");
                             }
@@ -831,17 +841,17 @@ namespace SRTPluginUIEDDirectXOverlay
                     //Enir Ilim
                     else if (EnirIlim.Contains(gameMemory.RegionID))
                     {
-                        if (counter == 203 && status.Equals("Alive"))
+                        if (counter == 207 && status.Equals("Alive"))
                         {
-                            if (counter == 203)
+                            if (counter == 207)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Enir Ilim", "");
                             }
                             DrawTextBlock(ref textOffsetX, ref statsYOffset, bossOffset.Key, status);
                         }
-                        else if (counter == 203 && status.Equals("Dead"))
+                        else if (counter == 207 && status.Equals("Dead"))
                         {
-                            if (counter == 203)
+                            if (counter == 207)
                             {
                                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "Enir Ilim", "");
                             }
@@ -852,8 +862,9 @@ namespace SRTPluginUIEDDirectXOverlay
                     counter++;
                 }
                 killed = 167 - killed;
+                DLCkilled = 35 - DLCkilled;
                 DrawTextBlock(ref textOffsetX, ref statsYOffset,"Main Game Killed: ", killed.ToString() + "/167");
-                DrawTextBlock(ref textOffsetX, ref statsYOffset, "DLC Killed: ", killed.ToString() + "/204");
+                DrawTextBlock(ref textOffsetX, ref statsYOffset, "DLC Killed: ",DLCkilled.ToString() + "/37");
             }
             
         }
