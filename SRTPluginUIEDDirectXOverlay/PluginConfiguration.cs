@@ -17,6 +17,7 @@ namespace SRTPluginUIEDDirectXOverlay
 
         public string StringFontName { get; set; }
         public bool ShowBossStatus { get; set; }
+        public bool ShowDeathCount { get; set; }
 
         public PluginConfiguration()
         {
@@ -26,6 +27,7 @@ namespace SRTPluginUIEDDirectXOverlay
             PositionX = 5f;
             PositionY = 50f;
             ShowBossStatus = true;
+            ShowDeathCount = true;
             //InventoryPositionX = -1;
             //InventoryPositionY = -1;
             StringFontName = "Courier New";

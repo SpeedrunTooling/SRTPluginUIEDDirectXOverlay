@@ -10,6 +10,7 @@ namespace SRTPluginUIEDDirectXOverlay
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
         private const int VK_F1 = 0x70;
+        private const int VK_F2 = 0x71;
 
         private static LowLevelKeyboardProc _proc = HookCallback;
         private static IntPtr _hookID = IntPtr.Zero;
@@ -71,6 +72,11 @@ namespace SRTPluginUIEDDirectXOverlay
                 {
                     Config.ShowBossStatus = !Config.ShowBossStatus;
                     Console.WriteLine($"ShowBossStatus is now: {Config.ShowBossStatus}");
+                }
+                if (vkCode == VK_F2)
+                {
+                    Config.ShowDeathCount = !Config.ShowDeathCount;
+                    Console.WriteLine($"ShowDeathCount is now: {Config.ShowDeathCount}");
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);

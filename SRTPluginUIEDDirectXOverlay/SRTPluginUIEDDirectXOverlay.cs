@@ -42,10 +42,6 @@ namespace SRTPluginUIEDDirectXOverlay
 
         private string PlayerName = "";
 
-
-
-
-
         [STAThread]
         public override int Startup(IPluginHostDelegates hostDelegates)
         {
@@ -145,7 +141,6 @@ namespace SRTPluginUIEDDirectXOverlay
             _window?.FitTo(gameWindowHandle, true);
             Message message;
             
-
             try
             {
                 _graphics?.BeginScene();
@@ -170,8 +165,6 @@ namespace SRTPluginUIEDDirectXOverlay
             }
             return 0;
         }
-
-
 
         private void DrawOverlay()
         {
@@ -866,7 +859,10 @@ namespace SRTPluginUIEDDirectXOverlay
                 DrawTextBlock(ref textOffsetX, ref statsYOffset,"Main Game Killed: ", killed.ToString() + "/167");
                 DrawTextBlock(ref textOffsetX, ref statsYOffset, "DLC Killed: ",DLCkilled.ToString() + "/37");
             }
-            
+            if (config.ShowDeathCount)
+            {
+                DrawTextBlock(ref textOffsetX, ref statsYOffset, "Deaths: ", gameMemory.DeathCount.ToString());
+            }
         }
 
         private float GetStringSize(string str, float size = 20f)
